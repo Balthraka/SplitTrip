@@ -1,0 +1,2 @@
+INSERT INTO users (id,email,name,created_at) VALUES ('u-alice','alice@example.com','Alice Test','2026-01-01T00:00:00.000Z'),('u-bob','bob@example.com','Bob Test','2026-01-01T00:00:00.000Z');
+INSERT INTO sessions (token_hash,user_id,verified_email,created_at,expires_at) VALUES ('dde96f5b27b2298476b272c037dfd2cb5438e3495510c51035db1ef55f2994a4','u-alice',1,'2026-11-20T00:00:00.000Z','2027-11-20T00:00:00.000Z'),('6bae0362848af71bf9dde2924116bee5375e8a4da437494e3588dfee8b35d0cc','u-bob',1,'2026-11-20T00:00:00.000Z','2027-11-20T00:00:00.000Z');

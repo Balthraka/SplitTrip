@@ -1,0 +1,21 @@
+name = "splittrip-api"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+workers_dev = true
+preview_urls = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "splittrip"
+database_id = "REPLACE-WITH-YOUR-D1-DATABASE-ID"
+migrations_dir = "schema"
+
+[vars]
+# Private mode: an email not already in `users` gets 403 not_invited.
+ALLOW_SIGNUPS = "false"
+# Public client IDs (not secrets). Create one Google Cloud project and one Microsoft app for SplitTrip only.
+GOOGLE_CLIENT_ID = "667390589368-3segjqnp0agt3necuv41pr5vrrlb122a.apps.googleusercontent.com"
+MS_CLIENT_ID = ""
+# Comma separated, exact origins only. Remove localhost entries before cutover.
+ALLOWED_ORIGINS = "https://YOUR-NAME.github.io,http://localhost:8080"
+SESSION_DAYS = "30"

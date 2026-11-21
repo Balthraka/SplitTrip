@@ -1,0 +1,87 @@
+SEARCH i USING INDEX sqlite_autoindex_identities_1 (provider=? AND subject=?)   <=   SELECT u.id, u.email, u.name AS name FROM identities i JOIN users u ON
+SEARCH u USING INDEX sqlite_autoindex_users_1 (id=?)   <=   SELECT u.id, u.email, u.name AS name FROM identities i JOIN users u ON
+SEARCH users USING INDEX sqlite_autoindex_users_2 (email=?)   <=   SELECT id, email, name AS name FROM users WHERE email = ?1
+SEARCH identities USING INDEX idx_identities_user (user_id=?)   <=   SELECT 1 AS x FROM identities WHERE user_id = ?1 AND provider = ?2
+SEARCH sessions USING INDEX idx_sessions_user (user_id=?)   <=   DELETE FROM sessions WHERE user_id = ?1 AND expires_at < ?2
+SEARCH s USING INDEX sqlite_autoindex_sessions_1 (token_hash=?)   <=   SELECT s.user_id, s.verified_email, u.email, u.name AS name FROM sessi
+SEARCH u USING INDEX sqlite_autoindex_users_1 (id=?)   <=   SELECT s.user_id, s.verified_email, u.email, u.name AS name FROM sessi
+MERGE (UNION)   <=   SELECT * FROM trips WHERE id IN (SELECT trip_id FROM trip_members WHER
+LEFT   <=   SELECT * FROM trips WHERE id IN (SELECT trip_id FROM trip_members WHER
+SEARCH trips USING INDEX sqlite_autoindex_trips_1 (id=?)   <=   SELECT * FROM trips WHERE id IN (SELECT trip_id FROM trip_members WHER
+LIST SUBQUERY 1   <=   SELECT * FROM trips WHERE id IN (SELECT trip_id FROM trip_members WHER
+SEARCH trip_members USING INDEX idx_members_user (user_id=?)   <=   SELECT * FROM trips WHERE id IN (SELECT trip_id FROM trip_members WHER
+CREATE BLOOM FILTER   <=   SELECT * FROM trips WHERE id IN (SELECT trip_id FROM trip_members WHER
+USE TEMP B-TREE FOR ORDER BY   <=   SELECT * FROM trips WHERE id IN (SELECT trip_id FROM trip_members WHER
+RIGHT   <=   SELECT * FROM trips WHERE id IN (SELECT trip_id FROM trip_members WHER
+SEARCH trips USING INDEX idx_trips_created_by (created_by=?)   <=   SELECT * FROM trips WHERE id IN (SELECT trip_id FROM trip_members WHER
+SEARCH trip_members USING INDEX idx_members_trip_user (trip_id=?)   <=   SELECT id, trip_id, user_id, name FROM trip_members WHERE trip_id IN (
+LIST SUBQUERY 2   <=   SELECT id, trip_id, user_id, name FROM trip_members WHERE trip_id IN (
+COMPOUND QUERY   <=   SELECT id, trip_id, user_id, name FROM trip_members WHERE trip_id IN (
+LEFT-MOST SUBQUERY   <=   SELECT id, trip_id, user_id, name FROM trip_members WHERE trip_id IN (
+SEARCH trip_members USING INDEX idx_members_user (user_id=?)   <=   SELECT id, trip_id, user_id, name FROM trip_members WHERE trip_id IN (
+UNION USING TEMP B-TREE   <=   SELECT id, trip_id, user_id, name FROM trip_members WHERE trip_id IN (
+SEARCH trips USING INDEX idx_trips_created_by (created_by=?)   <=   SELECT id, trip_id, user_id, name FROM trip_members WHERE trip_id IN (
+CREATE BLOOM FILTER   <=   SELECT id, trip_id, user_id, name FROM trip_members WHERE trip_id IN (
+USE TEMP B-TREE FOR ORDER BY   <=   SELECT id, trip_id, user_id, name FROM trip_members WHERE trip_id IN (
+SEARCH trips USING INDEX sqlite_autoindex_trips_1 (id=?)   <=   SELECT id, created_by, base_currency, expense_currency, version FROM t
+SEARCH trip_members USING COVERING INDEX idx_members_trip_user (trip_id=? AND user_id=?)   <=   SELECT 1 AS x FROM trip_members WHERE trip_id = ?1 AND user_id = ?2 LI
+SEARCH trips USING INDEX sqlite_autoindex_trips_1 (id=?)   <=   SELECT * FROM trips WHERE id = ?1
+SEARCH trip_members USING INDEX idx_members_trip_user (trip_id=?)   <=   SELECT * FROM trip_members WHERE trip_id = ?1 ORDER BY created_at
+USE TEMP B-TREE FOR ORDER BY   <=   SELECT * FROM trip_members WHERE trip_id = ?1 ORDER BY created_at
+SEARCH expenses USING INDEX idx_expenses_trip_date (trip_id=?)   <=   SELECT * FROM expenses WHERE trip_id = ?1 ORDER BY date DESC, created_
+SEARCH expense_splits USING INDEX idx_splits_trip (trip_id=?)   <=   SELECT id, expense_id, member_id, amount_cents FROM expense_splits WHE
+SEARCH payments USING INDEX idx_payments_trip (trip_id=?)   <=   SELECT * FROM payments WHERE trip_id = ?1 ORDER BY created_at DESC
+SEARCH trip_members USING INDEX idx_members_trip_user (trip_id=?)   <=   SELECT id FROM trip_members WHERE trip_id = ?1
+SEARCH trips USING INDEX sqlite_autoindex_trips_1 (id=?)   <=   UPDATE trips SET last_activity_at = MAX(last_activity_at, ?2) WHERE id
+SEARCH expenses USING INDEX sqlite_autoindex_expenses_1 (id=?)   <=   SELECT * FROM expenses WHERE id = ?1 AND trip_id = ?2
+SEARCH expense_splits USING INDEX idx_splits_expense (expense_id=?)   <=   SELECT id, member_id, amount_cents FROM expense_splits WHERE expense_i
+SEARCH expenses USING INDEX sqlite_autoindex_expenses_1 (id=?)   <=   SELECT id, created_by FROM expenses WHERE id = ?1 AND trip_id = ?2
+SEARCH expenses USING INDEX sqlite_autoindex_expenses_1 (id=?)   <=   UPDATE expenses SET paid_by_member_id=?1, amount_cents=?2, currency=?3
+SEARCH expense_splits USING COVERING INDEX idx_splits_expense (expense_id=?)   <=   DELETE FROM expense_splits WHERE expense_id = ?1 AND EXISTS (SELECT 1 
+SCALAR SUBQUERY 1   <=   DELETE FROM expense_splits WHERE expense_id = ?1 AND EXISTS (SELECT 1 
+SEARCH expenses USING INDEX sqlite_autoindex_expenses_1 (id=?)   <=   DELETE FROM expense_splits WHERE expense_id = ?1 AND EXISTS (SELECT 1 
+SCAN CONSTANT ROW   <=   INSERT INTO expense_splits (id, expense_id, trip_id, member_id, amount
+SCALAR SUBQUERY 1   <=   INSERT INTO expense_splits (id, expense_id, trip_id, member_id, amount
+SEARCH expenses USING INDEX sqlite_autoindex_expenses_1 (id=?)   <=   INSERT INTO expense_splits (id, expense_id, trip_id, member_id, amount
+SEARCH expenses USING INDEX sqlite_autoindex_expenses_1 (id=?)   <=   DELETE FROM expenses WHERE id = ?1 AND trip_id = ?2
+SEARCH expense_splits USING COVERING INDEX idx_splits_expense (expense_id=?)   <=   DELETE FROM expenses WHERE id = ?1 AND trip_id = ?2
+SEARCH trips USING INDEX sqlite_autoindex_trips_1 (id=?)   <=   UPDATE trips SET last_activity_at = COALESCE((SELECT MAX(created_at) F
+SCALAR SUBQUERY 1   <=   UPDATE trips SET last_activity_at = COALESCE((SELECT MAX(created_at) F
+SEARCH expenses USING COVERING INDEX idx_expenses_trip_created (trip_id=?)   <=   UPDATE trips SET last_activity_at = COALESCE((SELECT MAX(created_at) F
+SEARCH trip_members USING INDEX sqlite_autoindex_trip_members_1 (id=?)   <=   SELECT id FROM trip_members WHERE trip_id = ?1 AND id IN (?2, ?3)
+SEARCH payments USING INDEX sqlite_autoindex_payments_1 (id=?)   <=   SELECT * FROM payments WHERE id = ?1
+SEARCH payments USING INDEX sqlite_autoindex_payments_1 (id=?)   <=   UPDATE payments SET status='confirmed', confirmed_by=?1, confirmed_at=
+SEARCH payments USING INDEX sqlite_autoindex_payments_1 (id=?)   <=   DELETE FROM payments WHERE id = ?1 AND trip_id = ?2 AND status = 'pend
+LIST SUBQUERY 1   <=   DELETE FROM payments WHERE id = ?1 AND trip_id = ?2 AND status = 'pend
+SEARCH trip_members USING INDEX idx_members_trip_user (trip_id=? AND user_id=?)   <=   DELETE FROM payments WHERE id = ?1 AND trip_id = ?2 AND status = 'pend
+CREATE BLOOM FILTER   <=   DELETE FROM payments WHERE id = ?1 AND trip_id = ?2 AND status = 'pend
+LIST SUBQUERY 2   <=   DELETE FROM payments WHERE id = ?1 AND trip_id = ?2 AND status = 'pend
+SEARCH trip_members USING COVERING INDEX idx_members_trip_user (trip_id=?)   <=   SELECT COUNT(*) AS n FROM trip_members WHERE trip_id = ?1
+SEARCH trip_members USING INDEX sqlite_autoindex_trip_members_1 (id=?)   <=   SELECT id FROM trip_members WHERE id = ?1 AND trip_id = ?2
+SEARCH expenses USING COVERING INDEX idx_expenses_paid_by (paid_by_member_id=?)   <=   SELECT 1 AS x FROM expenses WHERE paid_by_member_id = ?1 LIMIT 1
+SEARCH trip_members USING INDEX sqlite_autoindex_trip_members_1 (id=?)   <=   DELETE FROM trip_members WHERE id = ?1 AND trip_id = ?2
+SEARCH payments USING COVERING INDEX idx_payments_to (to_member_id=?)   <=   DELETE FROM trip_members WHERE id = ?1 AND trip_id = ?2
+SEARCH payments USING COVERING INDEX idx_payments_from (from_member_id=?)   <=   DELETE FROM trip_members WHERE id = ?1 AND trip_id = ?2
+SEARCH expense_splits USING COVERING INDEX idx_splits_member (member_id=?)   <=   DELETE FROM trip_members WHERE id = ?1 AND trip_id = ?2
+SEARCH expenses USING COVERING INDEX idx_expenses_paid_by (paid_by_member_id=?)   <=   DELETE FROM trip_members WHERE id = ?1 AND trip_id = ?2
+SEARCH trips USING INDEX sqlite_autoindex_trips_1 (id=?)   <=   UPDATE trips SET name=?1, description=?2, base_currency=?3, expense_cu
+SEARCH users USING INDEX sqlite_autoindex_users_1 (id=?)   <=   UPDATE users SET name = ?1 WHERE id = ?2
+SEARCH trip_members USING INDEX idx_members_user (user_id=?)   <=   UPDATE trip_members SET name = ?1 WHERE user_id = ?2
+SEARCH trip_members USING INDEX idx_members_email_unclaimed (email=?)   <=   UPDATE trip_members SET user_id = ?1 WHERE email = ?2 AND user_id IS N
+SEARCH trips USING INDEX sqlite_autoindex_trips_1 (id=?)   <=   DELETE FROM trips WHERE id = ?1
+SEARCH payments USING COVERING INDEX idx_payments_trip (trip_id=?)   <=   DELETE FROM trips WHERE id = ?1
+SEARCH expense_splits USING COVERING INDEX idx_splits_trip (trip_id=?)   <=   DELETE FROM trips WHERE id = ?1
+SEARCH expenses USING COVERING INDEX idx_expenses_trip_created (trip_id=?)   <=   DELETE FROM trips WHERE id = ?1
+SEARCH trip_members USING COVERING INDEX idx_members_trip_user (trip_id=?)   <=   DELETE FROM trips WHERE id = ?1
+SEARCH trips USING COVERING INDEX idx_trips_created_by (created_by=?)   <=   UPDATE trips SET created_by = ( SELECT tm.user_id FROM trip_members tm
+CORRELATED SCALAR SUBQUERY 1   <=   UPDATE trips SET created_by = ( SELECT tm.user_id FROM trip_members tm
+SEARCH tm USING INDEX idx_members_trip_user (trip_id=? AND user_id>?)   <=   UPDATE trips SET created_by = ( SELECT tm.user_id FROM trip_members tm
+USE TEMP B-TREE FOR ORDER BY   <=   UPDATE trips SET created_by = ( SELECT tm.user_id FROM trip_members tm
+SEARCH users USING INDEX sqlite_autoindex_users_1 (id=?)   <=   DELETE FROM users WHERE id = ?1
+SEARCH payments USING COVERING INDEX idx_payments_confirmed_by (confirmed_by=?)   <=   DELETE FROM users WHERE id = ?1
+SEARCH payments USING COVERING INDEX idx_payments_initiated_by (initiated_by=?)   <=   DELETE FROM users WHERE id = ?1
+SEARCH expenses USING COVERING INDEX idx_expenses_created_by (created_by=?)   <=   DELETE FROM users WHERE id = ?1
+SEARCH trip_members USING COVERING INDEX idx_members_user (user_id=?)   <=   DELETE FROM users WHERE id = ?1
+SEARCH trips USING COVERING INDEX idx_trips_created_by (created_by=?)   <=   DELETE FROM users WHERE id = ?1
+SEARCH sessions USING COVERING INDEX idx_sessions_user (user_id=?)   <=   DELETE FROM users WHERE id = ?1
+SEARCH identities USING COVERING INDEX idx_identities_user (user_id=?)   <=   DELETE FROM users WHERE id = ?1
