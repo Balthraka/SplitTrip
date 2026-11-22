@@ -1,0 +1,21 @@
+node_modules/
+.wrangler/
+.dev.vars
+*.csv
+!test/fixtures/*.csv
+exports/
+import-out/
+rates.json
+# database backups and exports hold real data: keep them out of the repo
+*.sql
+!schema/*.sql
+!core/schema.sql
+!test-web/seed-users.sql
+backup*/
+*.sqlite
+*.db
+import/
+Backups/
+backups/
+.wrangler/
+out/
