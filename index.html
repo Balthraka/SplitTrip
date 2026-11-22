@@ -253,7 +253,7 @@
 
     async function getRate(from, to, date) {
       if (from === to) return 1;
-      const today = new Date().toISOString().split('T')[0];
+      const today = todayISO();
       const apiDate = date >= today ? 'latest' : date;
       const fromL = from.toLowerCase();
       const toL   = to.toLowerCase();
@@ -292,7 +292,7 @@
           want.set(`${cur.toLowerCase()}@${apiDate}`, [cur, date]);
         };
         for (const e of expenses) add(e.currency, e.date);
-        for (const p of confirmedPayments) add(p.currency, p.confirmed_at ? p.confirmed_at.split('T')[0] : today);
+        for (const p of confirmedPayments) add(p.currency, p.confirmed_at ? localDateOf(p.confirmed_at) : today);
         await Promise.all([...want.values()].map(([c, d]) => getRate(c, baseCurrency, d).catch(() => {})));
       }
 
@@ -320,7 +320,7 @@
         let rate = 1;
         if (pmt.currency !== baseCurrency) {
           try {
-            const date = pmt.confirmed_at ? pmt.confirmed_at.split('T')[0] : todayISO();
+            const date = pmt.confirmed_at ? localDateOf(pmt.confirmed_at) : todayISO();
             rate = await getRate(pmt.currency, baseCurrency, date);
           } catch { /* use rate 1 as fallback */ }
         }
@@ -514,7 +514,13 @@
         weekday: 'long', day: 'numeric', month: 'long',
       });
 
-    const todayISO = () => new Date().toISOString().split('T')[0];
+    // Dates the person sees are LOCAL dates. toISOString() is UTC, which in Sydney is the day before until about 11 am.
+    const localDate = (d = new Date()) => {
+      const p = (n) => String(n).padStart(2, '0');
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    };
+    const localDateOf = (iso) => localDate(new Date(iso));   // the local date of a stored UTC timestamp
+    const todayISO = () => localDate();
 
     // Amount formatting — used by AddExpenseModal for comma-separated display
     const fmtAmt = (str) => {
@@ -870,6 +876,8 @@
         setDeleteErr('');
         try { await api('DELETE', '/me'); }
         catch (e) {
+          // 401 = the session is already gone (for example the account was deleted but the reply was lost). Nothing is left to delete: sign out.
+          if (e && e.status === 401) { writeToken(null); window.location.reload(); return; }
           setDeletingAcct(false);
           setDeleteErr((e && e.message) || 'Could not delete the account. Please try again.');
           return;
@@ -914,7 +922,7 @@
                   className={inputCls} />
               </Field>
               {deleteErr && <Toast message={deleteErr} />}
-              <Btn variant="danger" full loading={deletingAcct} onClick={deleteAccount}>
+              <Btn variant="danger" full loading={deletingAcct} disabled={deleteConfirm !== 'DELETE'} onClick={deleteAccount}>
                 Permanently Delete My Account
               </Btn>
             </div>
@@ -1528,7 +1536,7 @@
           g[e.date].push({ type: 'expense', data: e, ts: new Date(e.created_at).getTime() });
         });
         (payments || []).filter(p => p.status === 'confirmed').forEach(p => {
-          const date = p.created_at.split('T')[0];
+          const date = localDateOf(p.created_at);
           if (!g[date]) g[date] = [];
           g[date].push({ type: 'payment', data: p, ts: new Date(p.created_at).getTime() });
         });
